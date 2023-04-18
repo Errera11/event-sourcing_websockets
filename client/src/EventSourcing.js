@@ -19,17 +19,12 @@ function LongPolling() {
     Get()
   }, [])
 
-  const Get = async() => {
-    try {
-      const data =
-          await axios.get(process.env.REACT_APP_API_URL);
-      setMessage(prev => [data.data, ...prev])
-      await Get();
-    } catch(e) {
-      console.log(e);
-      setTimeout(() => Get(), 5000);
+  const Get = () => {
+    const eventSource = new EventSource(process.env.REACT_APP_API_URL);
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      setMessage(prev => [data, ...prev])
     }
-
   }
 
   return (

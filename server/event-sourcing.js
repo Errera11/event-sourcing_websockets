@@ -13,11 +13,19 @@ PORT=process.env.PORT
 try {
     app.listen(PORT, () => console.log('Started with ' + PORT));
     app.post('', (req, res) => {
-
+        emitter.emit("newMessage", req.body)
+        res.status(200).end();
     })
 
     app.get('', (req, res) => {
-
+        res.writeHead(200, {
+            "Connection": "keep-alive",
+            "Content-type": "text/event-stream",
+            "Cache-Control": "no-cache"
+        })
+        emitter.on('newMessage', message => {
+            res.write(`data: ${JSON.stringify(message)} \n\n`);
+        })
     })
 
 } catch (e) {
